@@ -1,0 +1,38 @@
+alloc(ConvertRoutine, 512)
+alloc(ConvertBackRoutine, 512)
+alloc(TypeName, 256)
+alloc(ByteSize, 4)
+alloc(CallMethod, 1)
+
+TypeName:
+db '2x 4 Bytes', 0       // The name of the custom value type
+
+ByteSize:
+dd 4                     // The size of the value in bytes (4 for 4 bytes)
+
+CallMethod:
+db 1                     // Indicate this custom type uses routines
+
+ConvertRoutine:
+[64-bit]
+mov eax, [rcx]           // Load the 4-byte value into EAX
+shr eax, 1               // Divide the value by 2 (logical shift right)
+ret                      // Return the modified value
+[/64-bit]
+[32-bit]
+mov eax, [eax]           // Load the 4-byte value into EAX
+shr eax, 1               // Divide the value by 2 (logical shift right)
+ret                      // Return the modified value
+[/32-bit]
+
+ConvertBackRoutine:
+[64-bit]
+shl ecx, 1               // Multiply the input value by 2 (logical shift left)
+mov [rdx], ecx           // Store the result back into memory
+ret                      // Return control
+[/64-bit]
+[32-bit]
+shl eax, 1               // Multiply the input value by 2 (logical shift left)
+mov [edx], eax           // Store the result back into memory
+ret                      // Return control
+[/32-bit]
